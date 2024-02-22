@@ -1,5 +1,6 @@
 package com.javabeans.springauthserver.config;
 
+import com.javabeans.springauthserver.service.ClientService;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -48,6 +49,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AuthorizationSecurityConfig {
     private final PasswordEncoder passwordEncoder;
+    private final ClientService clientService;
 
     @Bean
     @Order(1)
@@ -64,10 +66,10 @@ public class AuthorizationSecurityConfig {
     @Order(2)
     public SecurityFilterChain webSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/**", "/client/**").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(Customizer.withDefaults());
-        httpSecurity.csrf(csrf -> csrf.ignoringRequestMatchers("/auth/**"));
+        httpSecurity.csrf(csrf -> csrf.ignoringRequestMatchers("/auth/**", "/client/**"));
         return httpSecurity.build();
     }
 
@@ -77,7 +79,7 @@ public class AuthorizationSecurityConfig {
         return new InMemoryUserDetailsManager(userDetails);
     }*/
 
-    @Bean
+    /*@Bean
     public RegisteredClientRepository registeredClientRepository(){
         RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("client")
@@ -91,7 +93,7 @@ public class AuthorizationSecurityConfig {
                 .clientSettings(getClientSettings())
                 .build();
         return new InMemoryRegisteredClientRepository(registeredClient);
-    }
+    }*/
 
     @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer(){
@@ -109,12 +111,12 @@ public class AuthorizationSecurityConfig {
         };
     }
 
-    @Bean
+    /*@Bean
     public ClientSettings getClientSettings() {
         return ClientSettings.builder().requireProofKey(true).build();
     }
 
-
+*/
     @Bean
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder().issuer("http://localhost:9090").build();
